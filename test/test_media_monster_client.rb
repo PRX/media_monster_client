@@ -15,23 +15,23 @@ class TestMediaMonsterClient < Test::Unit::TestCase
     MediaMonsterClient.version = 'v1'
   end
 
-  # def test_create_job
-  #   response = MediaMonsterClient.create_job do |job|
-  #     job.job_type = 'audio'
-  #     job.original = 's3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2'
-  #     job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
-  # 
-  #     job.add_task( 'transcode',
-  #                   {:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'128'},
-  #                   's3://development.tcf.prx.org/public/audio_files/21/test.mp3',
-  #                   nil,
-  #                   'download')
-  # 
-  #   end
-  #   
-  #   puts response.inspect
-  # 
-  # end 
+  def test_create_job
+    response = MediaMonsterClient.create_job do |job|
+      job.job_type = 'audio'
+      job.original = 's3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2'
+      job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
+  
+      job.add_task( 'transcode',
+                    {:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'128'},
+                    's3://development.tcf.prx.org/public/audio_files/21/test.mp3',
+                    nil,
+                    'download')
+  
+    end
+    
+    puts response.inspect
+  
+  end 
   
   def test_create_job_with_sequence
     response = MediaMonsterClient.create_job do |job|
