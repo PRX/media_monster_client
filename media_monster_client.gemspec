@@ -14,8 +14,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "media_monster_client"
 
-  s.add_dependency("activesupport", "2.3.9")
-  # s.add_dependency("active_model")
+  s.add_dependency("activesupport")
   s.add_dependency("oauth")
 
   s.files         = `git ls-files`.split("\n")
