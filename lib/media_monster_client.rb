@@ -25,18 +25,36 @@ module MediaMonsterClient
     def create_job(job=nil)
       job ||= MediaMonster::Job.new
       yield job
-      post(create_url("jobs"), job.to_json, {'Accept'=>'application/json', 'Content-Type'=>'application/json'})
+      job.tap do |j|
+        j_str = post(create_url('jobs'), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'}).body
+        json  = JSON.parse(j_str)
+        j.id  = json['job']['id']
+      end
     end
     
     def update_task(task_id, task_status)
       json = {'task'=>{'status'=>task_status}}.to_json
       put(create_url("tasks/#{task_id.to_i}"), json, {'Accept'=>'application/json', 'Content-Type'=>'application/json'})
     end
+    
+    def retry_job(job)
+      case job
+      when MediaMonster::Job then job
+      when Fixnum then MediaMonster::Job.new(:id => job)
+      when String then MediaMonster::Job.new(:id => job.to_i)   
+      end.tap do |j|
+        post(retry_url(j), {}, {'Accept'=>'application/json'})
+      end
+    end
 
     protected
 
     def create_url(path)
       "/api/#{version}/#{path}"
+    end
+    
+    def retry_url(model)
+      "/api/#{version}/#{model.class.to_s.downcase.pluralize}/#{model.id}/retry"
     end
 
     [:delete, :get, :head, :post, :put, :request].each do |method|

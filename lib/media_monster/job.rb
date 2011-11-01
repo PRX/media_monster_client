@@ -6,6 +6,7 @@ module MediaMonster
     attr_accessor :original # file location
     attr_accessor :call_back  # url for webhook
     attr_accessor :tasks  # array of tasks
+    attr_accessor :id
 
     def initialize(*args)
       super
@@ -35,6 +36,10 @@ module MediaMonster
         MediaMonster::Task.new(*args)
       end
       @tasks << new_task
+    end
+    
+    def retry!
+      MediaMonsterClient.retry_job self
     end
 
   end
