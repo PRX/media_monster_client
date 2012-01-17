@@ -3,6 +3,7 @@ module MediaMonster
   class Job < Model
 
     attr_accessor :job_type # which type of job is this? audio to start, video, document, etc.
+    attr_accessor :priority # curently supports blank and 'high'
     attr_accessor :original # file location
     attr_accessor :call_back  # url for webhook
     attr_accessor :tasks  # array of tasks
