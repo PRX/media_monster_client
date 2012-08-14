@@ -11,9 +11,8 @@ module MediaMonster
     
     # for retry logic, you can set a number of times to retry (retry_max)
     # and how long to wait before try in seconds (retry_delay)
-    attr_accessor :retry_count
-    attr_accessor :retry_delay    
     attr_accessor :retry_max
+    attr_accessor :retry_delay    
 
     def initialize(*args)
       super
