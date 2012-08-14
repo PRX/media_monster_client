@@ -15,18 +15,18 @@ class TestMediaMonsterClient < Test::Unit::TestCase
     MediaMonsterClient.port    = 3000
     MediaMonsterClient.version = 'v1'
 
-    FakeWeb.register_uri(:post, "http://development.prx.org:3000/api/v1/jobs", :body => MediaMonster::Job.new(:id=>123).to_json)
+    # FakeWeb.register_uri(:post, "http://development.prx.org:3000/api/v1/jobs", :body => MediaMonster::Job.new(:id=>123).to_json)
   end
 
   def test_create_job_with_hash_original
     response = MediaMonsterClient.create_job do |job|
       job.job_type = 'audio'
-      job.original = {:url=>'s3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2', :format=>'mp2'}
-      job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
+      job.original = {'s3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test_FAIL.mp2'}
+      job.call_back = "http://development.prx.org:3001/audio_files/21/processed"
   
       job.add_task( 'transcode',
                     {:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'128'},
-                    's3://development.tcf.prx.org/public/audio_files/21/test.mp3',
+                    's3://development.tcf.prx.org/public/audio_files/21/test_AK.mp3',
                     nil,
                     'download')
   
@@ -36,48 +36,48 @@ class TestMediaMonsterClient < Test::Unit::TestCase
     assert !response.id.blank?
   end 
 
-  
-  def test_create_job
-    response = MediaMonsterClient.create_job do |job|
-      job.job_type = 'audio'
-      job.original = 's3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2'
-      job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
-  
-      job.add_task( 'transcode',
-                    {:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'128'},
-                    's3://development.tcf.prx.org/public/audio_files/21/test.mp3',
-                    nil,
-                    'download')
-  
-    end
-    
-    puts response.inspect
-  
-  end 
-  
-  def test_create_job_with_sequence
-    response = MediaMonsterClient.create_job do |job|
-      job.job_type = 'audio'
-      job.original = 's3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2'
-      job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
-  
-      job.add_sequence do |s|
-        s.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
-        s.label = 'preview'
-  
-        s.add_task( :task_type=>'cut',
-                    :options=>{:length=>4, :fade=>1},
-                    :label=>'cut it')
-  
-        s.add_task( :task_type=>'transcode',
-                    :options=>{:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'64'},
-                    :label=>'mp3',
-                    :result=>'s3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test_preview.mp3')
-      end
-  
-    end
-    puts response.inspect
-  end
+  # 
+  # def test_create_job
+  #   response = MediaMonsterClient.create_job do |job|
+  #     job.job_type = 'audio'
+  #     job.original = 's3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2'
+  #     job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
+  # 
+  #     job.add_task( 'transcode',
+  #                   {:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'128'},
+  #                   's3://development.tcf.prx.org/public/audio_files/21/test.mp3',
+  #                   nil,
+  #                   'download')
+  # 
+  #   end
+  #   
+  #   puts response.inspect
+  # 
+  # end 
+  # 
+  # def test_create_job_with_sequence
+  #   response = MediaMonsterClient.create_job do |job|
+  #     job.job_type = 'audio'
+  #     job.original = 's3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test.mp2'
+  #     job.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
+  # 
+  #     job.add_sequence do |s|
+  #       s.call_back = "http://development.prx.org:3001/audio_files/21/transcoded"
+  #       s.label = 'preview'
+  # 
+  #       s.add_task( :task_type=>'cut',
+  #                   :options=>{:length=>4, :fade=>1},
+  #                   :label=>'cut it')
+  # 
+  #       s.add_task( :task_type=>'transcode',
+  #                   :options=>{:format=>'mp3', :sample_rate=>'44100', :bit_rate=>'64'},
+  #                   :label=>'mp3',
+  #                   :result=>'s3://development.tcf.prx.org/public/uploads/entry_audio_files/2/test_preview.mp3')
+  #     end
+  # 
+  #   end
+  #   puts response.inspect
+  # end
 
     # MediaMonsterClient.create_job do |job|
     #   job.job_type = 'audio'

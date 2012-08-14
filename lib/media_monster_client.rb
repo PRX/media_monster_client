@@ -26,6 +26,7 @@ module MediaMonsterClient
       job ||= MediaMonster::Job.new
       yield job
       job.tap do |j|
+        # puts "posting: #{j.to_json}"
         j_str = post(create_url('jobs'), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'}).body
         json  = JSON.parse(j_str)
         j.id  = json['job']['id']
