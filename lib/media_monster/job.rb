@@ -2,7 +2,6 @@ module MediaMonster
 
   class Job < Model
 
-    attr_accessor :id
     attr_accessor :priority     # Now supports a numeric value
     attr_accessor :job_type     # which type of job is this? audio to start, video, document, etc.
     attr_accessor :original     # file location

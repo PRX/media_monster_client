@@ -26,36 +26,49 @@ module MediaMonsterClient
       job ||= MediaMonster::Job.new
       yield job
       job.tap do |j|
-        # puts "posting: #{j.to_json}"
-        j_str = post(create_url('jobs'), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'}).body
+        puts "posting: #{j.to_json}"
+        j_str = post(api_url('jobs'), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'}).body
         json  = JSON.parse(j_str)
         j.id  = json['job']['id']
       end
     end
-    
-    def update_task(task_id, task_status)
-      json = {'task'=>{'status'=>task_status}}.to_json
-      put(create_url("tasks/#{task_id.to_i}"), json, {'Accept'=>'application/json', 'Content-Type'=>'application/json'})
+
+    def update_job(job)
+      to_model(MediaMonster::Job, job).tap do |j|
+        puts "putting: #{j.to_json}"
+        put(model_url(j), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'})
+      end
     end
     
     def retry_job(job)
-      case job
-      when MediaMonster::Job then job
-      when Fixnum then MediaMonster::Job.new(:id => job)
-      when String then MediaMonster::Job.new(:id => job.to_i)   
-      end.tap do |j|
-        post(retry_url(j), {}, {'Accept'=>'application/json'})
+      to_model(MediaMonster::Job, job).tap do |j|
+        put("#{model_url(j)}/retry", {}, {'Accept'=>'application/json'})
       end
     end
 
+    def update_task(task_id, task_status)
+      json = {'task'=>{'status'=>task_status}}.to_json
+      put(api_url("tasks/#{task_id.to_i}"), json, {'Accept'=>'application/json', 'Content-Type'=>'application/json'})
+    end    
+
     protected
 
-    def create_url(path)
+    def to_model(klass, param)
+      case param
+      when klass  then param
+      when Hash   then klass.new(param)
+      when Fixnum then klass.new(:id => param)
+      when String then klass.new(:id => param.to_i)
+      else klass.new(param)
+      end
+    end
+
+    def api_url(path)
       "/api/#{version}/#{path}"
     end
     
-    def retry_url(model)
-      "/api/#{version}/#{model.class.to_s.downcase.pluralize}/#{model.id}/retry"
+    def model_url(model)
+      api_url("#{model.class.to_s.demodulize.downcase.pluralize}/#{model.id}")
     end
 
     [:delete, :get, :head, :post, :put, :request].each do |method|
@@ -64,15 +77,15 @@ module MediaMonsterClient
       end
     end
 
+    def access_token
+      @access_token ||= OAuth::AccessToken.new(consumer)
+    end
+
     def consumer
       @consumer ||= OAuth::Consumer.new(key,
                                         secret,
-                                        :site               => "#{scheme || 'http'}://#{host}:#{port}",
-                                        :http_method        => :get)
-    end
-
-    def access_token
-      @access_token ||= OAuth::AccessToken.new(consumer)
+                                        :site        => "#{scheme || 'http'}://#{host}:#{port}",
+                                        :http_method => :get)
     end
 
   end

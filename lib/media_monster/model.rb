@@ -2,6 +2,9 @@ module MediaMonster
 
   class Model
 
+    attr_accessor :id
+    attr_accessor :status
+
     def initialize(*args)
       return unless args
       if args[0].is_a?(Hash)
