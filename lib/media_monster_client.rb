@@ -24,7 +24,7 @@ module MediaMonsterClient
 
     def create_job(job=nil)
       job ||= MediaMonster::Job.new
-      yield job
+      yield job if block_given?
       job.tap do |j|
         puts "posting: #{j.to_json}"
         j_str = post(api_url('jobs'), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'}).body
