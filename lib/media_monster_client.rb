@@ -26,7 +26,6 @@ module MediaMonsterClient
       job ||= MediaMonster::Job.new
       yield job if block_given?
       job.tap do |j|
-        puts "posting: #{j.to_json}"
         j_str = post(api_url('jobs'), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'}).body
         json  = JSON.parse(j_str)
         j.id  = json['job']['id']
@@ -35,11 +34,10 @@ module MediaMonsterClient
 
     def update_job(job)
       to_model(MediaMonster::Job, job).tap do |j|
-        puts "putting: #{j.to_json}"
         put(model_url(j), j.to_json, {'Accept'=>'application/json','Content-Type'=>'application/json'})
       end
     end
-    
+
     def retry_job(job)
       to_model(MediaMonster::Job, job).tap do |j|
         put("#{model_url(j)}/retry", {}, {'Accept'=>'application/json'})
@@ -49,7 +47,7 @@ module MediaMonsterClient
     def update_task(task_id, task_status)
       json = {'task'=>{'status'=>task_status}}.to_json
       put(api_url("tasks/#{task_id.to_i}"), json, {'Accept'=>'application/json', 'Content-Type'=>'application/json'})
-    end    
+    end
 
     protected
 
@@ -66,7 +64,7 @@ module MediaMonsterClient
     def api_url(path)
       "/api/#{version}/#{path}"
     end
-    
+
     def model_url(model)
       api_url("#{model.class.to_s.demodulize.downcase.pluralize}/#{model.id}")
     end
